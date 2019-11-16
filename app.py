@@ -1,7 +1,9 @@
 import pandas as pd
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, url_for
 import pickle
 import bz2
+import json
+import requests
 
 # load model
 #model = pickle.load(open('final_model.pkl','rb'))
@@ -12,8 +14,23 @@ with bz2.open('final_model', 'r') as fp:
 app = Flask(__name__)
 
 # routes
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
+def index():
 
+    result = None
+    if request.method == 'POST':
+        cn = request.form.get('cn')
+        gr = request.form.get('gr')
+        zden = request.form.get('zden')
+        rt = request.form.get('rt')
+
+        data = {"CN": cn, "GR": gr, "ZDEN": zden, "RT": rt}
+        data.update((x, [y]) for x, y in data.items())
+        result = model.predict(pd.DataFrame.from_dict(data))
+    
+    return render_template('view.html', result=result)
+
+@app.route('/api', methods=['POST'])
 def predict():
     # get data
     data = request.get_json(force=True)
