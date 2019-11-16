@@ -6,7 +6,7 @@ import bz2
 # load model
 #model = pickle.load(open('final_model.pkl','rb'))
 with bz2.open('final_model', 'r') as fp:
-    loaded_model = pickle.load(fp)
+    model = pickle.load(fp)
 
 # app
 app = Flask(__name__)
